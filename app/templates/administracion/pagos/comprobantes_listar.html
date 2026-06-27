@@ -1,0 +1,82 @@
+{% extends 'base_admin.html' %}
+{% block titulo %}Comprobantes{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item active">Comprobantes</li>{% endblock %}
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-receipt me-2 text-primary"></i>Revisión de Comprobantes</h4>
+</div>
+<div class="mb-3 d-flex gap-2">
+    <a href="{{ url_for('administracion.comprobantes') }}" class="btn btn-sm {% if not estado_filtro %}btn-dark{% else %}btn-outline-dark{% endif %}">Todos</a>
+    <a href="{{ url_for('administracion.comprobantes', estado='pendiente') }}" class="btn btn-sm {% if estado_filtro == 'pendiente' %}btn-warning{% else %}btn-outline-warning{% endif %}">Pendientes</a>
+    <a href="{{ url_for('administracion.comprobantes', estado='aprobado') }}" class="btn btn-sm {% if estado_filtro == 'aprobado' %}btn-success{% else %}btn-outline-success{% endif %}">Aprobados</a>
+    <a href="{{ url_for('administracion.comprobantes', estado='rechazado') }}" class="btn btn-sm {% if estado_filtro == 'rechazado' %}btn-danger{% else %}btn-outline-danger{% endif %}">Rechazados</a>
+</div>
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Comprobante</th>
+                        <th>Pedido</th>
+                        <th>Cliente</th>
+                        <th>Método</th>
+                        <th class="text-end">Monto</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-center pe-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comp in comprobantes %}
+                    <tr>
+                        <td class="ps-3">
+                            <a href="{{ comp.imagen_url }}" target="_blank">
+                                <img src="{{ comp.imagen_url }}" alt="Comprobante"
+                                     class="rounded border" style="width:55px;height:55px;object-fit:cover">
+                            </a>
+                        </td>
+                        <td class="fw-semibold small">{{ comp.pedido.numero_pedido }}</td>
+                        <td class="small">
+                            <div>{{ comp.pedido.usuario.nombre_completo }}</div>
+                            <div class="text-muted">{{ comp.creado_en | fecha_corta }}</div>
+                        </td>
+                        <td class="small">{{ comp.metodo_pago.nombre }}</td>
+                        <td class="text-end fw-semibold text-primary">{{ comp.monto | moneda }}</td>
+                        <td class="text-center">
+                            <span class="badge bg-{{ comp.clase_estado }}">{{ comp.etiqueta_estado }}</span>
+                        </td>
+                        <td class="text-center pe-3">
+                            {% if comp.estado == 'pendiente' %}
+                            <a href="{{ url_for('administracion.revisar_comprobante', comprobante_id=comp.id) }}"
+                               class="btn btn-warning btn-sm">
+                                <i class="bi bi-check-circle me-1"></i>Revisar
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('administracion.revisar_comprobante', comprobante_id=comp.id) }}"
+                               class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-eye me-1"></i>Ver
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">No hay comprobantes en este estado.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if paginacion.pages > 1 %}
+    <div class="card-footer">
+        <nav><ul class="pagination pagination-sm justify-content-center mb-0">
+            {% if paginacion.has_prev %}<li class="page-item"><a class="page-link" href="{{ url_for('administracion.comprobantes', pagina=paginacion.prev_num, estado=estado_filtro) }}"><i class="bi bi-chevron-left"></i></a></li>{% endif %}
+            {% for num in paginacion.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if num %}<li class="page-item {% if num == paginacion.page %}active{% endif %}"><a class="page-link" href="{{ url_for('administracion.comprobantes', pagina=num, estado=estado_filtro) }}">{{ num }}</a></li>
+                {% else %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}
+            {% endfor %}
+            {% if paginacion.has_next %}<li class="page-item"><a class="page-link" href="{{ url_for('administracion.comprobantes', pagina=paginacion.next_num, estado=estado_filtro) }}"><i class="bi bi-chevron-right"></i></a></li>{% endif %}
+        </ul></nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

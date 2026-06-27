@@ -1,0 +1,42 @@
+/* app/static/css/admin.css - Estilos del panel administrativo */
+
+body { background-color: #f4f6f9; }
+
+/* ── Sidebar ──────────────────────────────────────────── */
+#sidebar {
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0,0,0,.15);
+}
+#sidebar .nav-link {
+    padding: .5rem .75rem;
+    font-size: .9rem;
+    transition: background 0.2s;
+}
+#sidebar .nav-link:hover:not(.active) {
+    background-color: rgba(255,255,255,.1);
+}
+#sidebar .nav-link.active {
+    background-color: var(--bs-primary);
+    font-weight: 600;
+}
+
+/* ── Cards ────────────────────────────────────────────── */
+.card { border-radius: 12px; }
+.card-header { border-radius: 12px 12px 0 0 !important; font-size: .9rem; }
+
+/* ── Tables ────────────────────────────────────────────── */
+.table th {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-weight: 700;
+    color: #6c757d;
+}
+
+/* ── Stat cards ────────────────────────────────────────── */
+.border-start.border-4 { border-left-width: 4px !important; }
+
+/* ── Responsive sidebar ────────────────────────────────── */
+@media (max-width: 992px) {
+    #sidebar { min-width: 220px !important; }
+}

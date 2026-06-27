@@ -1,0 +1,76 @@
+{% extends 'base_admin.html' %}
+{% block titulo %}Usuarios{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item active">Usuarios</li>{% endblock %}
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-people me-2 text-primary"></i>Gestión de Usuarios</h4>
+    <a href="{{ url_for('administracion.crear_usuario') }}" class="btn btn-primary">
+        <i class="bi bi-person-plus me-1"></i>Nuevo Usuario
+    </a>
+</div>
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th class="text-center">Rol</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-center">Registro</th>
+                        <th class="text-center pe-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in usuarios %}
+                    <tr>
+                        <td class="ps-3 fw-semibold">{{ u.nombre_completo }}</td>
+                        <td class="text-muted small">{{ u.email }}</td>
+                        <td class="text-muted small">{{ u.telefono or '—' }}</td>
+                        <td class="text-center">
+                            <span class="badge {% if u.es_administrador %}bg-danger{% else %}bg-primary{% endif %}">
+                                {{ u.rol.nombre | capitalize }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge {% if u.activo %}bg-success{% else %}bg-secondary{% endif %}">
+                                {% if u.activo %}Activo{% else %}Inactivo{% endif %}
+                            </span>
+                        </td>
+                        <td class="text-center text-muted small">{{ u.creado_en | fecha_corta }}</td>
+                        <td class="text-center pe-3">
+                            <a href="{{ url_for('administracion.editar_usuario', usuario_id=u.id) }}"
+                               class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a>
+                            <form action="{{ url_for('administracion.eliminar_usuario', usuario_id=u.id) }}"
+                                  method="post" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('¿Eliminar este usuario?')">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">No hay usuarios registrados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if paginacion.pages > 1 %}
+    <div class="card-footer">
+        <nav><ul class="pagination pagination-sm justify-content-center mb-0">
+            {% if paginacion.has_prev %}<li class="page-item"><a class="page-link" href="{{ url_for('administracion.usuarios', pagina=paginacion.prev_num) }}"><i class="bi bi-chevron-left"></i></a></li>{% endif %}
+            {% for num in paginacion.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if num %}<li class="page-item {% if num == paginacion.page %}active{% endif %}"><a class="page-link" href="{{ url_for('administracion.usuarios', pagina=num) }}">{{ num }}</a></li>
+                {% else %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}
+            {% endfor %}
+            {% if paginacion.has_next %}<li class="page-item"><a class="page-link" href="{{ url_for('administracion.usuarios', pagina=paginacion.next_num) }}"><i class="bi bi-chevron-right"></i></a></li>{% endif %}
+        </ul></nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

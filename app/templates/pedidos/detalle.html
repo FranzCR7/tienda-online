@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block titulo %}Pedido {{ pedido.numero_pedido }}{% endblock %}
+{% block contenido %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0">
+            <i class="bi bi-receipt me-2 text-primary"></i>Pedido #{{ pedido.numero_pedido }}
+        </h3>
+        <span class="badge bg-{{ pedido.clase_estado }} fs-6 px-3 py-2">{{ pedido.etiqueta_estado }}</span>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Productos del pedido -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header fw-semibold"><i class="bi bi-box-seam me-2"></i>Productos</div>
+                <div class="card-body p-0">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-center">Cant.</th>
+                                <th class="text-end">Precio Unit.</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle in pedido.detalles.all() %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">{{ detalle.producto.nombre if detalle.producto else 'Producto eliminado' }}</div>
+                                </td>
+                                <td class="text-center">{{ detalle.cantidad }}</td>
+                                <td class="text-end">{{ detalle.precio_unitario | moneda }}</td>
+                                <td class="text-end fw-semibold">{{ detalle.subtotal | moneda }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Total:</td>
+                                <td class="text-end fw-bold text-primary fs-5">{{ pedido.total | moneda }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Comprobante de pago -->
+            {% if pedido.comprobante_activo %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header fw-semibold"><i class="bi bi-receipt me-2"></i>Comprobante de Pago</div>
+                <div class="card-body">
+                    {% set comp = pedido.comprobante_activo %}
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="{{ comp.imagen_url }}" target="_blank">
+                            <img src="{{ comp.imagen_url }}" alt="Comprobante"
+                                 class="rounded border" style="width:100px;height:100px;object-fit:cover">
+                        </a>
+                        <div>
+                            <div class="fw-semibold">{{ comp.metodo_pago.nombre }}</div>
+                            <div class="text-muted small">Monto: {{ comp.monto | moneda }}</div>
+                            <div class="text-muted small">Subido: {{ comp.creado_en | fecha_larga }}</div>
+                            <span class="badge bg-{{ comp.clase_estado }} mt-1">{{ comp.etiqueta_estado }}</span>
+                            {% if comp.observaciones %}
+                            <div class="alert alert-warning mt-2 py-1 px-2 small mb-0">
+                                <i class="bi bi-info-circle me-1"></i>{{ comp.observaciones }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Info del pedido -->
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header fw-semibold bg-light"><i class="bi bi-info-circle me-2"></i>Información</div>
+                <div class="card-body">
+                    <dl class="row small mb-0">
+                        <dt class="col-5 text-muted">Número:</dt>
+                        <dd class="col-7 fw-semibold">{{ pedido.numero_pedido }}</dd>
+                        <dt class="col-5 text-muted">Fecha:</dt>
+                        <dd class="col-7">{{ pedido.creado_en | fecha_corta }}</dd>
+                        <dt class="col-5 text-muted">Estado:</dt>
+                        <dd class="col-7"><span class="badge bg-{{ pedido.clase_estado }}">{{ pedido.etiqueta_estado }}</span></dd>
+                        <dt class="col-5 text-muted">Total:</dt>
+                        <dd class="col-7 fw-bold text-primary">{{ pedido.total | moneda }}</dd>
+                        {% if pedido.direccion_entrega %}
+                        <dt class="col-5 text-muted">Dirección:</dt>
+                        <dd class="col-7">{{ pedido.direccion_entrega }}</dd>
+                        {% endif %}
+                        {% if pedido.notas %}
+                        <dt class="col-5 text-muted">Notas:</dt>
+                        <dd class="col-7">{{ pedido.notas }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="d-grid gap-2">
+                {% if pedido.puede_pagar %}
+                <a href="{{ url_for('pagos.seleccionar_metodo', pedido_id=pedido.id) }}"
+                   class="btn btn-success fw-semibold">
+                    <i class="bi bi-qr-code-scan me-2"></i>Pagar Ahora
+                </a>
+                <form action="{{ url_for('pedidos.cancelar', pedido_id=pedido.id) }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-outline-danger w-100"
+                            onclick="return confirm('¿Cancelar este pedido?')">
+                        <i class="bi bi-x-circle me-2"></i>Cancelar Pedido
+                    </button>
+                </form>
+                {% endif %}
+                <a href="{{ url_for('pedidos.historial') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Mis Pedidos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

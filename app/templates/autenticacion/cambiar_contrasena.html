@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block titulo %}Cambiar Contraseña{% endblock %}
+{% block contenido %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-key me-2"></i>Cambiar Contraseña</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.contrasena_actual.label(class='form-label fw-semibold') }}
+                            <div class="input-group">
+                                {{ form.contrasena_actual(class='form-control' + (' is-invalid' if form.contrasena_actual.errors else ''), id='passActual') }}
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePass('passActual',this)"><i class="bi bi-eye"></i></button>
+                                {% for e in form.contrasena_actual.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.nueva_contrasena.label(class='form-label fw-semibold') }}
+                            <div class="input-group">
+                                {{ form.nueva_contrasena(class='form-control' + (' is-invalid' if form.nueva_contrasena.errors else ''), id='passNueva', placeholder='Mínimo 8 caracteres') }}
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePass('passNueva',this)"><i class="bi bi-eye"></i></button>
+                                {% for e in form.nueva_contrasena.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            {{ form.confirmar_contrasena.label(class='form-label fw-semibold') }}
+                            <div class="input-group">
+                                {{ form.confirmar_contrasena(class='form-control' + (' is-invalid' if form.confirmar_contrasena.errors else ''), id='passConfirmar') }}
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePass('passConfirmar',this)"><i class="bi bi-eye"></i></button>
+                                {% for e in form.confirmar_contrasena.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            {{ form.enviar(class='btn btn-warning fw-semibold') }}
+                            <a href="{{ url_for('autenticacion.perfil') }}" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts_extra %}
+<script>
+function togglePass(id, btn) {
+    const input = document.getElementById(id);
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+    btn.innerHTML = isPass ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+}
+</script>
+{% endblock %}

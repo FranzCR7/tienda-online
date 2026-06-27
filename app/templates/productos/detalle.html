@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ producto.nombre }}{% endblock %}
+
+{% block contenido %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('principal.index') }}" class="text-decoration-none">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('productos.listar') }}" class="text-decoration-none">Productos</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('productos.listar') }}?categoria={{ producto.categoria_id }}" class="text-decoration-none">{{ producto.categoria.nombre }}</a></li>
+            <li class="breadcrumb-item active">{{ producto.nombre | truncar(40) }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Imagen del producto -->
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm overflow-hidden">
+                <img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}"
+                     class="img-fluid" style="max-height:450px;object-fit:contain;padding:1rem"
+                     onerror="this.src='/static/img/producto-default.png'">
+            </div>
+        </div>
+
+        <!-- Información del producto -->
+        <div class="col-md-7">
+            <div class="mb-2">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    <i class="bi bi-tag me-1"></i>{{ producto.categoria.nombre }}
+                </span>
+                {% if producto.destacado %}
+                <span class="badge bg-warning text-dark ms-1"><i class="bi bi-star-fill me-1"></i>Destacado</span>
+                {% endif %}
+            </div>
+
+            <h1 class="h3 fw-bold mb-3">{{ producto.nombre }}</h1>
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <span class="display-6 fw-bold text-primary">{{ producto.precio | moneda }}</span>
+                {% if producto.en_stock %}
+                <span class="badge bg-success-subtle text-success border border-success-subtle fs-6">
+                    <i class="bi bi-check-circle me-1"></i>En Stock ({{ producto.stock }})
+                </span>
+                {% else %}
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fs-6">
+                    <i class="bi bi-x-circle me-1"></i>Sin Stock
+                </span>
+                {% endif %}
+            </div>
+
+            {% if producto.descripcion %}
+            <p class="text-muted lh-lg mb-4">{{ producto.descripcion }}</p>
+            {% endif %}
+
+            <hr>
+
+            <!-- Formulario agregar al carrito -->
+            {% if producto.en_stock %}
+                {% if current_user.is_authenticated %}
+                <form action="{{ url_for('carrito.agregar') }}" method="post" class="mb-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {{ form_carrito.producto_id }}
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width:120px">
+                            <label class="form-label small fw-semibold">Cantidad</label>
+                            <input type="number" name="cantidad" class="form-control"
+                                   value="1" min="1" max="{{ producto.stock }}">
+                        </div>
+                        <div class="flex-grow-1 pt-4">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-cart-plus me-2"></i>Agregar al Carrito
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <a href="{{ url_for('carrito.ver') }}" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-bag me-2"></i>Ver Carrito
+                </a>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <a href="{{ url_for('autenticacion.login') }}" class="fw-semibold">Inicia sesión</a>
+                    para agregar productos al carrito.
+                </div>
+                {% endif %}
+            {% else %}
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>Este producto no está disponible actualmente.
+            </div>
+            {% endif %}
+
+            <!-- Info adicional -->
+            <div class="mt-4 p-3 bg-light rounded">
+                <div class="row g-2 text-center">
+                    <div class="col-4 border-end">
+                        <i class="bi bi-shield-check text-success d-block fs-4"></i>
+                        <small class="text-muted">Compra Segura</small>
+                    </div>
+                    <div class="col-4 border-end">
+                        <i class="bi bi-qr-code-scan text-primary d-block fs-4"></i>
+                        <small class="text-muted">Pago por QR</small>
+                    </div>
+                    <div class="col-4">
+                        <i class="bi bi-truck text-warning d-block fs-4"></i>
+                        <small class="text-muted">Envío Bolivia</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos relacionados -->
+    {% if relacionados %}
+    <section class="mt-5">
+        <h4 class="fw-bold mb-4 border-bottom pb-2">
+            <i class="bi bi-grid me-2 text-primary"></i>Productos Relacionados
+        </h4>
+        <div class="row g-4">
+            {% for rel in relacionados %}
+            <div class="col-sm-6 col-md-3">
+                {% set producto = rel %}
+                {% include 'productos/_tarjeta_producto.html' %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

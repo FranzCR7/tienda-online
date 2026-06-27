@@ -1,0 +1,91 @@
+/* app/static/css/estilos.css - Estilos personalizados de TiendaOnline */
+
+:root {
+    --primary: #0d6efd;
+    --transition: 0.25s ease;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+main { flex: 1; }
+
+/* ── Navbar ────────────────────────────────────────────── */
+.navbar-brand { letter-spacing: -0.5px; }
+
+/* ── Hero ──────────────────────────────────────────────── */
+.hero-section {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+/* ── Tarjetas de Producto ──────────────────────────────── */
+.producto-card {
+    transition: transform var(--transition), box-shadow var(--transition);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.producto-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,.12) !important;
+}
+.producto-img {
+    transition: transform 0.35s ease;
+}
+.producto-card:hover .producto-img {
+    transform: scale(1.05);
+}
+
+/* ── Tarjetas de Categoría ─────────────────────────────── */
+.categoria-card {
+    transition: transform var(--transition), box-shadow var(--transition);
+    border-radius: 12px;
+}
+.categoria-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.1) !important;
+    background-color: #f0f7ff;
+}
+
+/* ── Métodos de pago ───────────────────────────────────── */
+.metodo-card {
+    transition: all var(--transition);
+    border-radius: 10px;
+    cursor: pointer;
+}
+.metodo-card:hover {
+    border-color: var(--primary) !important;
+    background-color: #f0f7ff;
+}
+
+/* ── Alertas ───────────────────────────────────────────── */
+.alert { border-radius: 10px; }
+
+/* ── Botones ───────────────────────────────────────────── */
+.btn { border-radius: 8px; font-weight: 500; }
+.btn-lg { padding: .6rem 1.5rem; }
+
+/* ── Cards ─────────────────────────────────────────────── */
+.card { border-radius: 12px; }
+.card-header { border-radius: 12px 12px 0 0 !important; }
+
+/* ── Tables ────────────────────────────────────────────── */
+.table th { font-weight: 600; font-size: .85rem; text-transform: uppercase; letter-spacing: .5px; }
+
+/* ── Badges ────────────────────────────────────────────── */
+.badge { border-radius: 6px; font-weight: 500; }
+
+/* ── Footer ────────────────────────────────────────────── */
+footer a:hover { color: #fff !important; }
+
+/* ── Responsive images ─────────────────────────────────── */
+img { max-width: 100%; }
+
+/* ── Scrollbar personalizado ───────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #6c757d; }

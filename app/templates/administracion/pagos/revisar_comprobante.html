@@ -1,0 +1,84 @@
+{% extends 'base_admin.html' %}
+{% block titulo %}Revisar Comprobante{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('administracion.comprobantes') }}" class="text-decoration-none">Comprobantes</a></li>
+<li class="breadcrumb-item active">Revisar</li>
+{% endblock %}
+{% block contenido %}
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header fw-semibold"><i class="bi bi-image me-2"></i>Comprobante de Pago</div>
+            <div class="card-body text-center">
+                <a href="{{ comprobante.imagen_url }}" target="_blank">
+                    <img src="{{ comprobante.imagen_url }}" alt="Comprobante"
+                         class="img-fluid rounded border" style="max-height:400px">
+                </a>
+                <div class="mt-2">
+                    <a href="{{ comprobante.imagen_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-zoom-in me-1"></i>Ver tamaño completo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <!-- Info del comprobante -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header fw-semibold"><i class="bi bi-info-circle me-2"></i>Información</div>
+            <div class="card-body">
+                <dl class="row small">
+                    <dt class="col-5 text-muted">Pedido:</dt>
+                    <dd class="col-7 fw-semibold">
+                        <a href="{{ url_for('administracion.detalle_pedido', pedido_id=comprobante.pedido_id) }}">
+                            {{ comprobante.pedido.numero_pedido }}
+                        </a>
+                    </dd>
+                    <dt class="col-5 text-muted">Cliente:</dt>
+                    <dd class="col-7">{{ comprobante.pedido.usuario.nombre_completo }}</dd>
+                    <dt class="col-5 text-muted">Email:</dt>
+                    <dd class="col-7">{{ comprobante.pedido.usuario.email }}</dd>
+                    <dt class="col-5 text-muted">Método de Pago:</dt>
+                    <dd class="col-7">{{ comprobante.metodo_pago.nombre }}</dd>
+                    <dt class="col-5 text-muted">Monto Declarado:</dt>
+                    <dd class="col-7 fw-bold text-primary">{{ comprobante.monto | moneda }}</dd>
+                    <dt class="col-5 text-muted">Total del Pedido:</dt>
+                    <dd class="col-7 fw-bold">{{ comprobante.pedido.total | moneda }}</dd>
+                    <dt class="col-5 text-muted">Fecha Subida:</dt>
+                    <dd class="col-7">{{ comprobante.creado_en | fecha_larga }}</dd>
+                    <dt class="col-5 text-muted">Estado Actual:</dt>
+                    <dd class="col-7">
+                        <span class="badge bg-{{ comprobante.clase_estado }}">{{ comprobante.etiqueta_estado }}</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Formulario de revisión -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header fw-semibold bg-warning text-dark">
+                <i class="bi bi-check-circle me-2"></i>Decisión de Revisión
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.accion.label(class='form-label fw-semibold') }}
+                        {{ form.accion(class='form-select') }}
+                    </div>
+                    <div class="mb-4">
+                        {{ form.observaciones.label(class='form-label fw-semibold') }}
+                        {{ form.observaciones(class='form-control', rows=3,
+                           placeholder='Notas o motivo del rechazo (opcional)...') }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        {{ form.enviar(class='btn btn-warning fw-semibold') }}
+                        <a href="{{ url_for('administracion.comprobantes') }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

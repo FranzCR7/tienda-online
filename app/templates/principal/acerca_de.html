@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block titulo %}Acerca de{% endblock %}
+{% block contenido %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <i class="bi bi-bag-heart-fill display-1 text-primary mb-3"></i>
+            <h2 class="fw-bold">Acerca de TiendaOnline</h2>
+            <p class="lead text-muted">Tu tienda virtual de confianza en Bolivia</p>
+            <hr>
+            <p>TiendaOnline es un proyecto académico universitario desarrollado con Python Flask, PostgreSQL y Bootstrap 5. Implementa una tienda virtual completa con sistema de pagos mediante códigos QR.</p>
+            <div class="row mt-4 g-3">
+                <div class="col-md-4"><div class="p-3 bg-light rounded"><strong>Backend</strong><br><small class="text-muted">Python Flask + SQLAlchemy</small></div></div>
+                <div class="col-md-4"><div class="p-3 bg-light rounded"><strong>Base de Datos</strong><br><small class="text-muted">PostgreSQL</small></div></div>
+                <div class="col-md-4"><div class="p-3 bg-light rounded"><strong>Frontend</strong><br><small class="text-muted">Bootstrap 5 + JavaScript</small></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

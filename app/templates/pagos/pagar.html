@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block titulo %}Realizar Pago{% endblock %}
+{% block contenido %}
+<div class="container py-4">
+    <h3 class="fw-bold mb-4"><i class="bi bi-qr-code-scan me-2 text-primary"></i>Pago del Pedido</h3>
+
+    <div class="row g-4">
+        <!-- Selección de método de pago y QR -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header fw-semibold bg-primary text-white">
+                    <i class="bi bi-credit-card me-2"></i>Selecciona el Método de Pago
+                </div>
+                <div class="card-body">
+                    <div class="row g-2 mb-3">
+                        {% for metodo in metodos %}
+                        <div class="col-6">
+                            <a href="{{ url_for('pagos.seleccionar_metodo', pedido_id=pedido.id, metodo=metodo.id) }}"
+                               class="card text-center text-decoration-none border-2 h-100 metodo-card
+                                      {% if metodo_seleccionado.id == metodo.id %}border-primary bg-primary-subtle{% else %}border-light{% endif %}">
+                                <div class="card-body py-2 px-1">
+                                    <i class="bi bi-qr-code fs-3 {% if metodo_seleccionado.id == metodo.id %}text-primary{% else %}text-muted{% endif %}"></i>
+                                    <div class="fw-semibold small mt-1 text-dark">{{ metodo.nombre }}</div>
+                                    {% if metodo.titular %}
+                                    <div class="text-muted" style="font-size:.7rem">{{ metodo.titular }}</div>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- QR del método seleccionado -->
+                    <div class="text-center p-3 bg-light rounded">
+                        <h6 class="fw-semibold mb-3">{{ metodo_seleccionado.nombre }}</h6>
+                        {% if metodo_seleccionado.imagen_qr %}
+                        <img src="{{ metodo_seleccionado.qr_url }}" alt="QR {{ metodo_seleccionado.nombre }}"
+                             class="img-fluid rounded border" style="max-width:220px;max-height:220px">
+                        {% else %}
+                        <div class="border rounded d-flex align-items-center justify-content-center bg-white"
+                             style="width:200px;height:200px;margin:0 auto">
+                            <div class="text-center text-muted">
+                                <i class="bi bi-qr-code display-4"></i>
+                                <div class="small mt-2">QR no configurado</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if metodo_seleccionado.numero_cuenta %}
+                        <div class="mt-2 text-muted small">
+                            <i class="bi bi-phone me-1"></i>{{ metodo_seleccionado.numero_cuenta }}
+                        </div>
+                        {% endif %}
+                        <div class="mt-3 p-2 bg-warning-subtle rounded border border-warning">
+                            <div class="fw-bold fs-5 text-dark">Total: {{ pedido.total | moneda }}</div>
+                            <div class="text-muted small">Monto exacto a transferir</div>
+                        </div>
+                        <div class="mt-2 text-muted small">
+                            Pedido: <strong>{{ pedido.numero_pedido }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario subir comprobante -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header fw-semibold bg-success text-white">
+                    <i class="bi bi-upload me-2"></i>Subir Comprobante de Pago
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info small mb-3">
+                        <i class="bi bi-info-circle me-1"></i>
+                        <strong>Instrucciones:</strong>
+                        <ol class="mb-0 ps-3 mt-1">
+                            <li>Escanea el código QR con tu aplicación bancaria.</li>
+                            <li>Transfiere exactamente <strong>{{ pedido.total | moneda }}</strong>.</li>
+                            <li>Toma una captura del comprobante de pago.</li>
+                            <li>Sube la imagen aquí y espera la verificación.</li>
+                        </ol>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" novalidate
+                          action="{{ url_for('pagos.seleccionar_metodo', pedido_id=pedido.id, metodo=metodo_seleccionado.id) }}">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.metodo_pago_id.label(class='form-label fw-semibold') }}
+                            {{ form.metodo_pago_id(class='form-select' + (' is-invalid' if form.metodo_pago_id.errors else '')) }}
+                            {% for e in form.metodo_pago_id.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.comprobante.label(class='form-label fw-semibold') }}
+                            {{ form.comprobante(class='form-control' + (' is-invalid' if form.comprobante.errors else ''),
+                                                accept='image/*,.pdf', id='inputComprobante') }}
+                            <div class="form-text">Formatos: JPG, PNG, PDF (máx. 16MB)</div>
+                            {% for e in form.comprobante.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+
+                            <!-- Preview de la imagen -->
+                            <div id="previewContainer" class="mt-2 d-none">
+                                <img id="previewImg" src="" alt="Vista previa" class="img-thumbnail" style="max-height:150px">
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            {{ form.enviar(class='btn btn-success btn-lg fw-semibold') }}
+                            <a href="{{ url_for('pedidos.detalle', pedido_id=pedido.id) }}"
+                               class="btn btn-outline-secondary">Pagar más tarde</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Resumen del pedido -->
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-header fw-semibold"><i class="bi bi-receipt me-2"></i>Resumen</div>
+                <div class="card-body py-2">
+                    {% for detalle in pedido.detalles.all() %}
+                    <div class="d-flex justify-content-between small py-1 border-bottom">
+                        <span class="text-muted">{{ detalle.producto.nombre | truncar(35) }} × {{ detalle.cantidad }}</span>
+                        <span>{{ detalle.subtotal | moneda }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="d-flex justify-content-between fw-bold mt-2">
+                        <span>Total:</span>
+                        <span class="text-primary">{{ pedido.total | moneda }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.getElementById('inputComprobante')?.addEventListener('change', function() {
+    const file = this.files[0];
+    const container = document.getElementById('previewContainer');
+    const img = document.getElementById('previewImg');
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = e => { img.src = e.target.result; container.classList.remove('d-none'); };
+        reader.readAsDataURL(file);
+    } else {
+        container.classList.add('d-none');
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base_admin.html' %}
+{% block titulo %}Productos{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item active">Productos</li>{% endblock %}
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-box-seam me-2 text-primary"></i>Gestión de Productos</h4>
+    <a href="{{ url_for('administracion.crear_producto') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>Nuevo Producto
+    </a>
+</div>
+
+<!-- Búsqueda -->
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="q" class="form-control form-control-sm" placeholder="Buscar producto..."
+                   value="{{ q or '' }}" style="max-width:300px">
+            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search me-1"></i>Buscar</button>
+            {% if q %}<a href="{{ url_for('administracion.productos') }}" class="btn btn-outline-secondary btn-sm">Limpiar</a>{% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3" style="width:60px">Img</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th class="text-end">Precio</th>
+                        <th class="text-center">Stock</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-center pe-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prod in productos %}
+                    <tr>
+                        <td class="ps-3">
+                            <img src="{{ prod.imagen_url }}" alt="{{ prod.nombre }}"
+                                 class="rounded" style="width:45px;height:45px;object-fit:cover"
+                                 onerror="this.src='/static/img/producto-default.png'">
+                        </td>
+                        <td>
+                            <div class="fw-semibold">{{ prod.nombre | truncar(45) }}</div>
+                            {% if prod.destacado %}<span class="badge bg-warning text-dark" style="font-size:.65rem">Destacado</span>{% endif %}
+                        </td>
+                        <td class="text-muted small">{{ prod.categoria.nombre }}</td>
+                        <td class="text-end fw-semibold text-primary">{{ prod.precio | moneda }}</td>
+                        <td class="text-center">
+                            <span class="badge {% if prod.stock == 0 %}bg-danger{% elif prod.stock < 5 %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                                {{ prod.stock }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge {% if prod.activo %}bg-success{% else %}bg-secondary{% endif %}">
+                                {% if prod.activo %}Activo{% else %}Inactivo{% endif %}
+                            </span>
+                        </td>
+                        <td class="text-center pe-3">
+                            <a href="{{ url_for('productos.detalle', producto_id=prod.id) }}"
+                               target="_blank" class="btn btn-outline-secondary btn-sm" title="Ver en tienda">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{{ url_for('administracion.editar_producto', producto_id=prod.id) }}"
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="{{ url_for('administracion.eliminar_producto', producto_id=prod.id) }}"
+                                  method="post" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('¿Eliminar este producto permanentemente?')">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">No hay productos registrados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if paginacion.pages > 1 %}
+    <div class="card-footer">
+        <nav><ul class="pagination pagination-sm justify-content-center mb-0">
+            {% if paginacion.has_prev %}
+            <li class="page-item"><a class="page-link" href="{{ url_for('administracion.productos', pagina=paginacion.prev_num, q=q) }}"><i class="bi bi-chevron-left"></i></a></li>
+            {% endif %}
+            {% for num in paginacion.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if num %}<li class="page-item {% if num == paginacion.page %}active{% endif %}"><a class="page-link" href="{{ url_for('administracion.productos', pagina=num, q=q) }}">{{ num }}</a></li>
+                {% else %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}
+            {% endfor %}
+            {% if paginacion.has_next %}
+            <li class="page-item"><a class="page-link" href="{{ url_for('administracion.productos', pagina=paginacion.next_num, q=q) }}"><i class="bi bi-chevron-right"></i></a></li>
+            {% endif %}
+        </ul></nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

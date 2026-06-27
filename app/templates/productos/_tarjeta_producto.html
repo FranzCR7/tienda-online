@@ -1,0 +1,60 @@
+{# app/templates/productos/_tarjeta_producto.html - Tarjeta reutilizable de producto #}
+<div class="card h-100 shadow-sm border-0 producto-card">
+    <div class="position-relative overflow-hidden" style="height:200px">
+        <img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}"
+             class="card-img-top w-100 h-100 object-fit-cover producto-img"
+             onerror="this.src='/static/img/producto-default.png'">
+        {% if producto.destacado %}
+        <span class="position-absolute top-0 start-0 badge bg-warning text-dark m-2">
+            <i class="bi bi-star-fill me-1"></i>Destacado
+        </span>
+        {% endif %}
+        {% if not producto.en_stock %}
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+             style="background:rgba(0,0,0,0.5)">
+            <span class="badge bg-danger fs-6">Sin Stock</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card-body d-flex flex-column">
+        <p class="text-muted small mb-1">
+            <i class="bi bi-tag me-1"></i>{{ producto.categoria.nombre }}
+        </p>
+        <h6 class="card-title fw-semibold mb-2 lh-sm">
+            <a href="{{ url_for('productos.detalle', producto_id=producto.id) }}"
+               class="text-decoration-none text-dark">
+                {{ producto.nombre | truncar(60) }}
+            </a>
+        </h6>
+        <div class="mt-auto">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="fs-5 fw-bold text-primary">{{ producto.precio | moneda }}</span>
+                <small class="text-muted">
+                    <i class="bi bi-box me-1"></i>{{ producto.stock }} disponibles
+                </small>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('productos.detalle', producto_id=producto.id) }}"
+                   class="btn btn-outline-primary btn-sm flex-grow-1">
+                    <i class="bi bi-eye me-1"></i>Ver
+                </a>
+                {% if current_user.is_authenticated and producto.en_stock %}
+                <form action="{{ url_for('carrito.agregar') }}" method="post" class="flex-grow-1">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                    <input type="hidden" name="cantidad" value="1">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-cart-plus me-1"></i>Agregar
+                    </button>
+                </form>
+                {% elif not current_user.is_authenticated %}
+                <a href="{{ url_for('autenticacion.login') }}" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="bi bi-cart-plus me-1"></i>Agregar
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

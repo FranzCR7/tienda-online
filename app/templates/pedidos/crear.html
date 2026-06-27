@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block titulo %}Confirmar Pedido{% endblock %}
+{% block contenido %}
+<div class="container py-4">
+    <h3 class="fw-bold mb-4"><i class="bi bi-bag-check me-2 text-primary"></i>Confirmar Pedido</h3>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header fw-semibold bg-light">
+                    <i class="bi bi-list-check me-2"></i>Productos del Pedido
+                </div>
+                <div class="card-body p-0">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-center">Cant.</th>
+                                <th class="text-end">Precio</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle in carrito.detalles.all() %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">{{ detalle.producto.nombre | truncar(50) }}</div>
+                                    <div class="text-muted small">{{ detalle.producto.categoria.nombre }}</div>
+                                </td>
+                                <td class="text-center">{{ detalle.cantidad }}</td>
+                                <td class="text-end">{{ detalle.precio_unitario | moneda }}</td>
+                                <td class="text-end fw-semibold">{{ detalle.subtotal | moneda }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold fs-5">Total a Pagar:</td>
+                                <td class="text-end fw-bold fs-5 text-primary">{{ carrito.total | moneda }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header fw-semibold bg-primary text-white">
+                    <i class="bi bi-truck me-2"></i>Datos de Entrega
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.direccion_entrega.label(class='form-label fw-semibold') }}
+                            {{ form.direccion_entrega(class='form-control', placeholder=current_user.direccion or 'Av. Ejemplo 123, La Paz') }}
+                            <div class="form-text">Si no ingresas dirección, usaremos la de tu perfil.</div>
+                        </div>
+                        <div class="mb-4">
+                            {{ form.notas.label(class='form-label fw-semibold') }}
+                            {{ form.notas(class='form-control', rows=3, placeholder='Instrucciones especiales, referencia...') }}
+                        </div>
+                        <div class="alert alert-info small">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Después de confirmar, seleccionarás el método de pago QR.
+                        </div>
+                        <div class="d-grid gap-2">
+                            {{ form.enviar(class='btn btn-success btn-lg fw-semibold') }}
+                            <a href="{{ url_for('carrito.ver') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Volver al Carrito
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

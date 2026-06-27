@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block titulo %}Comprobante de Pago{% endblock %}
+{% block contenido %}
+<div class="container py-4">
+    <h3 class="fw-bold mb-4"><i class="bi bi-receipt me-2 text-primary"></i>Comprobante de Pago</h3>
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <img src="{{ comprobante.imagen_url }}" alt="Comprobante" class="img-fluid rounded border" style="max-height:400px">
+                </div>
+                <div class="card-footer">
+                    <dl class="row small mb-0">
+                        <dt class="col-5">Pedido:</dt><dd class="col-7">{{ comprobante.pedido.numero_pedido }}</dd>
+                        <dt class="col-5">Método:</dt><dd class="col-7">{{ comprobante.metodo_pago.nombre }}</dd>
+                        <dt class="col-5">Monto:</dt><dd class="col-7 fw-bold text-primary">{{ comprobante.monto | moneda }}</dd>
+                        <dt class="col-5">Estado:</dt><dd class="col-7"><span class="badge bg-{{ comprobante.clase_estado }}">{{ comprobante.etiqueta_estado }}</span></dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Inicio{% endblock %}
+
+{% block contenido %}
+
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container py-3">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-5 fw-bold mb-3">
+                    Bienvenido a<br><span class="text-warning">TiendaOnline</span>
+                </h1>
+                <p class="lead mb-4">Encuentra los mejores productos al mejor precio. Electrónica, ropa, hogar y mucho más.</p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('productos.listar') }}" class="btn btn-warning btn-lg fw-semibold">
+                        <i class="bi bi-grid me-2"></i>Ver Productos
+                    </a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('autenticacion.registro') }}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-person-plus me-2"></i>Registrarse
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center d-none d-lg-block">
+                <i class="bi bi-bag-heart-fill" style="font-size:10rem;opacity:0.3"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categorías -->
+{% if categorias %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="h4 fw-bold mb-4 text-center">
+            <i class="bi bi-tags me-2 text-primary"></i>Categorías
+        </h2>
+        <div class="row g-3 justify-content-center">
+            {% for categoria in categorias %}
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <a href="{{ url_for('productos.listar') }}?categoria={{ categoria.id }}"
+                   class="card text-center text-decoration-none border-0 shadow-sm h-100 categoria-card">
+                    <div class="card-body py-3">
+                        <i class="bi bi-tag-fill fs-3 text-primary mb-2 d-block"></i>
+                        <span class="fw-semibold small text-dark">{{ categoria.nombre }}</span>
+                        <div class="text-muted" style="font-size:.75rem">{{ categoria.total_productos }} productos</div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Productos Destacados -->
+{% if productos_destacados %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4 fw-bold mb-0">
+                <i class="bi bi-star-fill me-2 text-warning"></i>Productos Destacados
+            </h2>
+            <a href="{{ url_for('productos.listar') }}" class="btn btn-outline-primary btn-sm">Ver todos</a>
+        </div>
+        <div class="row g-4">
+            {% for producto in productos_destacados %}
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                {% include 'productos/_tarjeta_producto.html' %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Productos Recientes -->
+{% if productos_recientes %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4 fw-bold mb-0">
+                <i class="bi bi-clock-history me-2 text-primary"></i>Recién Llegados
+            </h2>
+            <a href="{{ url_for('productos.listar') }}?orden=reciente" class="btn btn-outline-primary btn-sm">Ver todos</a>
+        </div>
+        <div class="row g-4">
+            {% for producto in productos_recientes %}
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                {% include 'productos/_tarjeta_producto.html' %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Beneficios -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="bi bi-shield-check fs-1 text-success mb-3 d-block"></i>
+                    <h6 class="fw-bold">Compra Segura</h6>
+                    <p class="text-muted small mb-0">Tus datos protegidos con cifrado SSL</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="bi bi-truck fs-1 text-primary mb-3 d-block"></i>
+                    <h6 class="fw-bold">Envío Rápido</h6>
+                    <p class="text-muted small mb-0">Entrega en toda Bolivia</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="bi bi-qr-code-scan fs-1 text-warning mb-3 d-block"></i>
+                    <h6 class="fw-bold">Pago QR</h6>
+                    <p class="text-muted small mb-0">Yape, BNB, Banco Unión y más</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="bi bi-headset fs-1 text-danger mb-3 d-block"></i>
+                    <h6 class="fw-bold">Soporte 24/7</h6>
+                    <p class="text-muted small mb-0">Estamos aquí para ayudarte</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

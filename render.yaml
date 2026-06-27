@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: tienda-online
+    env: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      flask db upgrade
+      flask crear-admin
+      flask poblar-db
+    startCommand: gunicorn run:app --workers 2 --bind 0.0.0.0:$PORT --timeout 120
+    envVars:
+      - key: FLASK_ENV
+        value: produccion
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tienda-online-db
+          property: connectionString
+
+databases:
+  - name: tienda-online-db
+    plan: free
+    databaseName: tienda_online
+    user: tienda_user

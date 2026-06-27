@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block titulo %}Mi Perfil{% endblock %}
+{% block contenido %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Mi Perfil</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {{ form.hidden_tag() }}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ form.nombre.label(class='form-label fw-semibold') }}
+                                {{ form.nombre(class='form-control' + (' is-invalid' if form.nombre.errors else '')) }}
+                                {% for e in form.nombre.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.apellido.label(class='form-label fw-semibold') }}
+                                {{ form.apellido(class='form-control' + (' is-invalid' if form.apellido.errors else '')) }}
+                                {% for e in form.apellido.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.telefono.label(class='form-label fw-semibold') }}
+                                {{ form.telefono(class='form-control' + (' is-invalid' if form.telefono.errors else ''), placeholder='70000000') }}
+                                {% for e in form.telefono.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.ciudad.label(class='form-label fw-semibold') }}
+                                {{ form.ciudad(class='form-control', placeholder='Ej: La Paz') }}
+                            </div>
+                            <div class="col-12">
+                                {{ form.direccion.label(class='form-label fw-semibold') }}
+                                {{ form.direccion(class='form-control', placeholder='Av. Ejemplo 123') }}
+                            </div>
+                            <div class="col-12">
+                                {{ form.foto_perfil.label(class='form-label fw-semibold') }}
+                                {{ form.foto_perfil(class='form-control') }}
+                                <div class="form-text">Formatos: JPG, PNG, GIF, WEBP (máx. 16MB)</div>
+                            </div>
+                        </div>
+                        <div class="d-grid mt-4">
+                            {{ form.enviar(class='btn btn-primary') }}
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="{{ url_for('autenticacion.cambiar_contrasena') }}" class="btn btn-outline-warning btn-sm">
+                        <i class="bi bi-key me-1"></i>Cambiar Contraseña
+                    </a>
+                    <a href="{{ url_for('pedidos.historial') }}" class="btn btn-outline-primary btn-sm ms-2">
+                        <i class="bi bi-clock-history me-1"></i>Mis Pedidos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
